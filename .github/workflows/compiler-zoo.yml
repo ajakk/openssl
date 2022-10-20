@@ -69,7 +69,7 @@ jobs:
             llvm-ppa-name: jammy
           }, {
             cc: gcc,
-            distro: ubuntu-22.04,
+            distro: 'alpine:latest',
             container: 'alpine:latest',
           }
         ]
@@ -78,7 +78,8 @@ jobs:
     # in a single version of Ubuntu.
     runs-on: ${{ matrix.zoo.distro }}
     steps:
-    - name: install packages
+    - name: install packages (ubuntu)
+      if: ${{ matrix.os.distro != 'alpine:latest' }}
       run: |
         llvm_ppa_name="${{ matrix.zoo.llvm-ppa-name }}"
 
@@ -102,6 +103,11 @@ jobs:
 
         sudo apt-get update
         sudo apt-get -y install ${{ matrix.zoo.cc }}
+
+    - name: install packages (alpine)
+      if: ${{ matrix.os.distro == 'alpine:latest' }}
+      run: |
+        apk --no-cache add build-base perl linux-headers
 
     - uses: actions/checkout@v2
 
